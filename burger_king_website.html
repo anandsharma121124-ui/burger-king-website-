@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Burger King — Have It Your Way</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;900&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bk-red: #D62300;
+    --bk-orange: #FF8732;
+    --bk-yellow: #FFCB00;
+    --bk-dark: #1A0A00;
+    --bk-white: #FFF9F0;
+    --bk-brown: #6B2E00;
+    --radius: 18px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bk-dark);
+    color: var(--bk-white);
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: .5;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 5%;
+    background: linear-gradient(to bottom, rgba(26,10,0,.95) 0%, transparent 100%);
+    backdrop-filter: blur(6px);
+  }
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    letter-spacing: 3px;
+    color: var(--bk-yellow);
+    text-shadow: 2px 2px 0 var(--bk-red);
+    text-decoration: none;
+  }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a {
+    color: var(--bk-white);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: .95rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: color .2s;
+  }
+  .nav-links a:hover { color: var(--bk-yellow); }
+  .nav-cta {
+    background: var(--bk-red);
+    color: #fff !important;
+    padding: 10px 24px;
+    border-radius: 50px;
+    font-weight: 900 !important;
+    transition: background .2s, transform .15s !important;
+  }
+  .nav-cta:hover { background: var(--bk-orange) !important; transform: scale(1.05); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    padding: 120px 5% 80px;
+    position: relative;
+    overflow: hidden;
+    background: radial-gradient(ellipse at 70% 50%, #3D1200 0%, var(--bk-dark) 70%);
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -2px; left: 0; right: 0;
+    height: 120px;
+    background: linear-gradient(to bottom, transparent, var(--bk-dark));
+  }
+  .hero-text { position: relative; z-index: 2; }
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bk-red);
+    color: #fff;
+    padding: 6px 16px;
+    border-radius: 50px;
+    font-size: .78rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    animation: slideIn .6s ease both;
+  }
+  .hero-eyebrow .dot { width: 8px; height: 8px; background: var(--bk-yellow); border-radius: 50%; animation: pulse 1.4s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
+  .hero-headline {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(4rem, 9vw, 9rem);
+    line-height: .9;
+    letter-spacing: 2px;
+    color: var(--bk-white);
+    margin-bottom: 28px;
+    animation: slideIn .7s .1s ease both;
+  }
+  .hero-headline span { color: var(--bk-yellow); display: block; -webkit-text-stroke: 2px var(--bk-orange); }
+  .hero-sub {
+    font-size: 1.15rem;
+    color: #c9a980;
+    max-width: 420px;
+    line-height: 1.7;
+    margin-bottom: 40px;
+    animation: slideIn .7s .2s ease both;
+  }
+  .hero-actions { display: flex; gap: 16px; flex-wrap: wrap; animation: slideIn .7s .3s ease both; }
+  .btn-primary {
+    background: var(--bk-yellow);
+    color: var(--bk-dark);
+    padding: 16px 40px;
+    border-radius: 50px;
+    font-weight: 900;
+    font-size: 1.05rem;
+    text-decoration: none;
+    letter-spacing: .5px;
+    border: none;
+    cursor: pointer;
+    transition: transform .15s, box-shadow .15s;
+    box-shadow: 0 4px 24px rgba(255,203,0,.3);
+  }
+  .btn-primary:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 8px 32px rgba(255,203,0,.45); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--bk-white);
+    padding: 16px 36px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1rem;
+    text-decoration: none;
+    border: 2px solid rgba(255,255,255,.25);
+    cursor: pointer;
+    transition: border-color .2s, color .2s;
+  }
+  .btn-ghost:hover { border-color: var(--bk-yellow); color: var(--bk-yellow); }
+  .hero-image {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: floatIn .9s .2s ease both;
+  }
+  .burger-svg-wrap {
+    position: relative;
+    width: 460px;
+    height: 460px;
+  }
+  .glow-ring {
+    position: absolute;
+    inset: 10%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,135,50,.25) 0%, transparent 70%);
+    animation: breathe 3s ease-in-out infinite;
+  }
+  @keyframes breathe { 0%,100%{transform:scale(1);opacity:.7} 50%{transform:scale(1.12);opacity:1} }
+
+  /* BURGER SVG */
+  .burger-svg { width: 100%; height: 100%; filter: drop-shadow(0 20px 60px rgba(255,100,0,.5)); animation: floatBurger 4s ease-in-out infinite; }
+  @keyframes floatBurger { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-18px)} }
+
+  /* ── STATS BAR ── */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    gap: 2px;
+    background: var(--bk-brown);
+    margin: 0;
+  }
+  .stat-item {
+    background: #200d00;
+    padding: 28px 20px;
+    text-align: center;
+    transition: background .2s;
+  }
+  .stat-item:hover { background: #2e1200; }
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.8rem;
+    color: var(--bk-yellow);
+    line-height: 1;
+  }
+  .stat-label { font-size: .78rem; color: #b07050; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700; margin-top: 4px; }
+
+  /* ── SECTION TITLES ── */
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.8rem, 6vw, 5rem);
+    line-height: 1;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+  }
+  .section-subtitle { color: #b07050; font-size: 1rem; max-width: 480px; line-height: 1.65; }
+
+  /* ── MENU SECTION ── */
+  .menu-section {
+    padding: 100px 5%;
+    background: #120600;
+  }
+  .menu-header { margin-bottom: 56px; }
+  .menu-tabs {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 48px;
+    flex-wrap: wrap;
+  }
+  .tab-btn {
+    background: transparent;
+    border: 2px solid #3A1800;
+    color: #b07050;
+    padding: 10px 26px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: .9rem;
+    cursor: pointer;
+    letter-spacing: .5px;
+    transition: all .2s;
+  }
+  .tab-btn.active, .tab-btn:hover {
+    background: var(--bk-red);
+    border-color: var(--bk-red);
+    color: #fff;
+  }
+  .menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 24px;
+  }
+  .menu-card {
+    background: linear-gradient(145deg, #1f0c00, #160800);
+    border: 1px solid #2a1200;
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: transform .25s, box-shadow .25s;
+    cursor: pointer;
+    position: relative;
+  }
+  .menu-card:hover {
+    transform: translateY(-8px) scale(1.01);
+    box-shadow: 0 16px 48px rgba(255,80,0,.2);
+    border-color: var(--bk-orange);
+  }
+  .menu-card-badge {
+    position: absolute;
+    top: 14px; right: 14px;
+    background: var(--bk-red);
+    color: #fff;
+    font-size: .65rem;
+    font-weight: 900;
+    padding: 4px 10px;
+    border-radius: 50px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .menu-card-img {
+    width: 100%;
+    height: 190px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at 50% 60%, #3a1500, #1a0800);
+    font-size: 6rem;
+  }
+  .menu-card-body { padding: 20px; }
+  .menu-card-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: 1px; color: var(--bk-white); margin-bottom: 6px; }
+  .menu-card-desc { font-size: .82rem; color: #9a6040; line-height: 1.5; margin-bottom: 16px; }
+  .menu-card-footer { display: flex; align-items: center; justify-content: space-between; }
+  .menu-card-price { font-family: 'Bebas Neue', sans-serif; font-size: 1.7rem; color: var(--bk-yellow); }
+  .add-btn {
+    background: var(--bk-red);
+    color: #fff;
+    border: none;
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    font-size: 1.4rem;
+    cursor: pointer;
+    transition: background .2s, transform .15s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .add-btn:hover { background: var(--bk-orange); transform: scale(1.15) rotate(90deg); }
+
+  /* ── DEAL BANNER ── */
+  .deal-banner {
+    margin: 0;
+    background: linear-gradient(135deg, var(--bk-red) 0%, #8B0000 50%, #3D0000 100%);
+    padding: 80px 5%;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .deal-banner::before {
+    content: 'DEAL';
+    position: absolute;
+    right: -2%;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22vw;
+    color: rgba(255,255,255,.04);
+    pointer-events: none;
+    line-height: 1;
+  }
+  .deal-tag {
+    display: inline-block;
+    background: var(--bk-yellow);
+    color: var(--bk-dark);
+    font-weight: 900;
+    font-size: .75rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: 4px;
+    margin-bottom: 18px;
+  }
+  .deal-banner .section-title { color: #fff; }
+  .deal-banner .section-subtitle { color: rgba(255,255,255,.7); }
+
+  /* ── LOCATOR ── */
+  .locator-section {
+    padding: 100px 5%;
+    background: var(--bk-dark);
+  }
+  .locator-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+    margin-top: 60px;
+  }
+  .locator-form { display: flex; flex-direction: column; gap: 16px; }
+  .input-row { display: flex; gap: 12px; }
+  .search-input {
+    flex: 1;
+    background: #1f0c00;
+    border: 2px solid #3A1800;
+    color: var(--bk-white);
+    padding: 16px 20px;
+    border-radius: 50px;
+    font-size: .95rem;
+    font-family: 'Nunito', sans-serif;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .search-input:focus { border-color: var(--bk-orange); }
+  .search-input::placeholder { color: #6a3820; }
+  .map-placeholder {
+    background: linear-gradient(135deg, #1f0c00, #2e1400);
+    border: 2px solid #3A1800;
+    border-radius: var(--radius);
+    height: 380px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    color: #6a3820;
+    font-size: .9rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  .map-icon { font-size: 3.5rem; }
+  .location-list { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
+  .location-item {
+    background: #1f0c00;
+    border: 1px solid #2a1200;
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: border-color .2s;
+    cursor: pointer;
+  }
+  .location-item:hover { border-color: var(--bk-orange); }
+  .loc-name { font-weight: 700; color: var(--bk-white); font-size: .95rem; }
+  .loc-dist { font-size: .78rem; color: #9a6040; margin-top: 3px; }
+  .loc-open { font-size: .75rem; color: #4CAF50; font-weight: 700; letter-spacing: 1px; }
+
+  /* ── APP CTA ── */
+  .app-section {
+    padding: 100px 5%;
+    background: linear-gradient(135deg, #200d00 0%, #0d0400 100%);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+  .app-phones {
+    display: flex;
+    justify-content: center;
+    gap: -20px;
+    position: relative;
+  }
+  .phone-mockup {
+    width: 180px;
+    height: 360px;
+    background: linear-gradient(145deg, #2a2a2a, #111);
+    border-radius: 32px;
+    border: 4px solid #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,.6);
+    flex-shrink: 0;
+  }
+  .phone-mockup:first-child {
+    transform: rotate(-8deg) translateX(20px);
+    z-index: 1;
+  }
+  .phone-mockup:last-child {
+    transform: rotate(6deg) translateX(-20px);
+    z-index: 1;
+  }
+  .phone-screen-content { font-size: 3rem; text-align: center; }
+  .phone-screen-label { font-size: .6rem; color: var(--bk-yellow); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-top: 8px; }
+  .app-badge-row { display: flex; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
+  .app-badge {
+    background: #1f0c00;
+    border: 2px solid #3A1800;
+    color: var(--bk-white);
+    padding: 14px 24px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    font-size: .85rem;
+    font-weight: 700;
+    transition: border-color .2s, transform .15s;
+  }
+  .app-badge:hover { border-color: var(--bk-yellow); transform: translateY(-2px); }
+  .app-badge-icon { font-size: 1.6rem; }
+
+  /* ── TESTIMONIALS ── */
+  .testimonials-section {
+    padding: 100px 5%;
+    background: #0d0400;
+  }
+  .testi-grid {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 24px;
+    margin-top: 56px;
+  }
+  .testi-card {
+    background: #1a0900;
+    border: 1px solid #2a1200;
+    border-radius: var(--radius);
+    padding: 30px;
+    transition: transform .2s, border-color .2s;
+  }
+  .testi-card:hover { transform: translateY(-4px); border-color: var(--bk-orange); }
+  .testi-stars { color: var(--bk-yellow); font-size: 1.1rem; margin-bottom: 16px; letter-spacing: 2px; }
+  .testi-text { font-size: .95rem; color: #c9a980; line-height: 1.7; margin-bottom: 20px; font-style: italic; }
+  .testi-author { display: flex; align-items: center; gap: 12px; }
+  .testi-avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--bk-red); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1rem; color: #fff; flex-shrink: 0; }
+  .testi-name { font-weight: 700; font-size: .9rem; }
+  .testi-date { font-size: .75rem; color: #6a3820; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: #0a0300;
+    border-top: 1px solid #2a1200;
+    padding: 60px 5% 30px;
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 48px;
+    margin-bottom: 48px;
+  }
+  .footer-brand p { color: #6a3820; font-size: .9rem; line-height: 1.7; margin-top: 12px; max-width: 280px; }
+  .footer-col h4 { font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; letter-spacing: 2px; color: var(--bk-yellow); margin-bottom: 16px; }
+  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .footer-col a { color: #6a3820; text-decoration: none; font-size: .9rem; transition: color .2s; }
+  .footer-col a:hover { color: var(--bk-white); }
+  .footer-bottom { border-top: 1px solid #2a1200; padding-top: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: gap; }
+  .footer-copy { color: #3a1800; font-size: .78rem; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes slideIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes floatIn { from { opacity: 0; transform: translateY(40px) scale(.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+  /* ── FLOATING CART ── */
+  .floating-cart {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    background: var(--bk-yellow);
+    color: var(--bk-dark);
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    box-shadow: 0 6px 30px rgba(255,203,0,.5);
+    cursor: pointer;
+    z-index: 999;
+    border: none;
+    transition: transform .2s, box-shadow .2s;
+    animation: slideIn .5s .8s ease both;
+  }
+  .floating-cart:hover { transform: scale(1.12); box-shadow: 0 10px 40px rgba(255,203,0,.65); }
+  .cart-badge {
+    position: absolute;
+    top: -4px; right: -4px;
+    background: var(--bk-red);
+    color: #fff;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    font-size: .7rem;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ── SCROLL REVEAL (JS driven) ── */
+  .reveal { opacity: 0; transform: translateY(40px); transition: opacity .7s ease, transform .7s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; padding-top: 100px; }
+    .hero-image { display: none; }
+    .stats-bar { grid-template-columns: repeat(2,1fr); }
+    .locator-grid, .app-section, .footer-grid { grid-template-columns: 1fr; }
+    .testi-grid { grid-template-columns: 1fr; }
+    nav .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">BURGER KING</a>
+  <ul class="nav-links">
+    <li><a href="#menu">Menu</a></li>
+    <li><a href="#deals">Deals</a></li>
+    <li><a href="#locator">Find Us</a></li>
+    <li><a href="#app">App</a></li>
+    <li><a href="#" class="nav-cta">Order Now</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-text">
+    <div class="hero-eyebrow">
+      <span class="dot"></span>
+      Now Serving — Delhi NCR &amp; Beyond
+    </div>
+    <h1 class="hero-headline">
+      FLAME
+      <span>GRILLED.</span>
+      ALWAYS.
+    </h1>
+    <p class="hero-sub">Real fire. Real flavor. No shortcuts. Every Whopper is flame-grilled to order — exactly the way you want it.</p>
+    <div class="hero-actions">
+      <a href="#menu" class="btn-primary">🔥 Order Now</a>
+      <a href="#deals" class="btn-ghost">Today's Deals</a>
+    </div>
+  </div>
+  <div class="hero-image">
+    <div class="burger-svg-wrap">
+      <div class="glow-ring"></div>
+      <svg class="burger-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+        <!-- BUN TOP -->
+        <ellipse cx="200" cy="120" rx="155" ry="78" fill="#c96c00"/>
+        <ellipse cx="200" cy="112" rx="148" ry="68" fill="#e07d10"/>
+        <ellipse cx="200" cy="106" rx="140" ry="58" fill="#f2941a"/>
+        <!-- SESAME SEEDS -->
+        <ellipse cx="175" cy="88" rx="9" ry="5" fill="#fff" opacity=".7" transform="rotate(-15 175 88)"/>
+        <ellipse cx="210" cy="82" rx="9" ry="5" fill="#fff" opacity=".7" transform="rotate(10 210 82)"/>
+        <ellipse cx="240" cy="92" rx="8" ry="4.5" fill="#fff" opacity=".7" transform="rotate(-8 240 92)"/>
+        <ellipse cx="163" cy="103" rx="7" ry="4" fill="#fff" opacity=".65" transform="rotate(12 163 103)"/>
+        <ellipse cx="227" cy="78" rx="7" ry="4" fill="#fff" opacity=".65"/>
+        <!-- CHEESE -->
+        <rect x="50" y="168" width="300" height="22" rx="4" fill="#FFD230"/>
+        <polygon points="50,168 50,190 30,190" fill="#e6b800"/>
+        <polygon points="350,168 350,190 370,190" fill="#e6b800"/>
+        <!-- LETTUCE -->
+        <path d="M40 200 Q80 183 120 200 Q160 217 200 200 Q240 183 280 200 Q320 217 360 200 L360 218 Q320 235 280 218 Q240 201 200 218 Q160 235 120 218 Q80 201 40 218 Z" fill="#3a8c2f"/>
+        <path d="M45 198 Q85 181 125 198 Q165 215 205 198 Q245 181 285 198 Q325 215 355 198" fill="none" stroke="#2d6e24" stroke-width="2"/>
+        <!-- TOMATO -->
+        <rect x="70" y="228" width="260" height="20" rx="6" fill="#d93b1e"/>
+        <line x1="120" y1="228" x2="120" y2="248" stroke="#b83018" stroke-width="1.5"/>
+        <line x1="170" y1="228" x2="170" y2="248" stroke="#b83018" stroke-width="1.5"/>
+        <line x1="230" y1="228" x2="230" y2="248" stroke="#b83018" stroke-width="1.5"/>
+        <line x1="280" y1="228" x2="280" y2="248" stroke="#b83018" stroke-width="1.5"/>
+        <!-- PATTY -->
+        <ellipse cx="200" cy="272" rx="160" ry="30" fill="#3a1c0a"/>
+        <ellipse cx="200" cy="268" rx="155" ry="27" fill="#5c2e10"/>
+        <ellipse cx="200" cy="264" rx="148" ry="23" fill="#6b3415"/>
+        <!-- GRILL MARKS -->
+        <path d="M110 255 Q130 270 150 255" stroke="#2a0e05" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <path d="M160 255 Q180 270 200 255" stroke="#2a0e05" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <path d="M210 255 Q230 270 250 255" stroke="#2a0e05" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <!-- BUN BOTTOM -->
+        <ellipse cx="200" cy="308" rx="160" ry="28" fill="#c96c00"/>
+        <ellipse cx="200" cy="314" rx="165" ry="28" fill="#e07d10"/>
+        <ellipse cx="200" cy="318" rx="160" ry="22" fill="#f5a030"/>
+        <!-- FLAME ACCENT -->
+        <path d="M168 340 Q180 310 172 290 Q188 320 182 340Z" fill="var(--bk-orange)" opacity=".7"/>
+        <path d="M205 344 Q218 308 210 285 Q228 320 220 344Z" fill="var(--bk-yellow)" opacity=".6"/>
+        <path d="M238 338 Q248 315 242 298 Q255 325 248 340Z" fill="var(--bk-orange)" opacity=".65"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar reveal">
+  <div class="stat-item">
+    <div class="stat-num">18,000+</div>
+    <div class="stat-label">Locations Worldwide</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">70+</div>
+    <div class="stat-label">Years of Flame-Grilling</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">40M+</div>
+    <div class="stat-label">Guests Served Daily</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">100%</div>
+    <div class="stat-label">Flame-Grilled Promise</div>
+  </div>
+</div>
+
+<!-- MENU -->
+<section class="menu-section" id="menu">
+  <div class="menu-header reveal">
+    <p style="color:var(--bk-orange);font-weight:900;letter-spacing:2px;text-transform:uppercase;font-size:.82rem;margin-bottom:8px;">🔥 What We've Got</p>
+    <h2 class="section-title">THE MENU</h2>
+    <p class="section-subtitle">Built for the bold. Every item flame-kissed, never faked. Customize to perfection — you're the boss.</p>
+  </div>
+  <div class="menu-tabs reveal">
+    <button class="tab-btn active">All</button>
+    <button class="tab-btn">Burgers</button>
+    <button class="tab-btn">Chicken</button>
+    <button class="tab-btn">Sides</button>
+    <button class="tab-btn">Drinks</button>
+    <button class="tab-btn">Desserts</button>
+    <button class="tab-btn">Value Meals</button>
+  </div>
+  <div class="menu-grid reveal">
+    <!-- Card 1 -->
+    <div class="menu-card">
+      <span class="menu-card-badge">🔥 Bestseller</span>
+      <div class="menu-card-img">🍔</div>
+      <div class="menu-card-body">
+        <div class="menu-card-name">Whopper</div>
+        <div class="menu-card-desc">A ¼ lb. flame-grilled beef patty topped with tomatoes, lettuce, mayo, ketchup, pickles, and sliced onion.</div>
+        <div class="menu-card-footer">
+          <span class="menu-card-price">₹219</span>
+          <button class="add-btn">+</button>
+        </div>
+      </div>
+    </div>
+    <!-- Card 2 -->
+    <div class="menu-card">
+      <span class="menu-card-badge" style="background:var(--bk-orange)">🌶 Spicy</span>
+      <div class="menu-card-img">🌶️</div>
+      <div class="menu-card-body">
+        <div class="menu-card-name">Spicy Crispy Chicken</div>
+        <div class="menu-card-desc">Crispy-fried chicken fillet coated in our fiery red sauce, topped with pickles and creamy mayo.</div>
+        <div class="menu-card-footer">
+          <span class="menu-card-price">₹199</span>
+          <button class="add-btn">+</button>
+        </div>
+      </div>
+    </div>
+    <!-- Card 3 -->
+    <div class="menu-card">
+      <div class="menu-card-img">🧀</div>
+      <div class="menu-card-body">
+        <div class="menu-card-name">Double Cheeseburger</div>
+        <div class="menu-card-desc">Two flame-grilled patties, double American cheese, pickles, mustard, and ketchup. No fluff, just beef.</div>
+        <div class="menu-card-footer">
+          <span class="menu-card-price">₹179</span>
+          <button class="add-btn">+</button>
+        </div>
+      </div>
+    </div>
+    <!-- Card 4 -->
+    <div class="menu-card">
+      <span class="menu-card-badge" style="background:#1a6e1a">🌿 Veg</span>
+      <div class="menu-card-img">🥦</div>
+      <div class="menu-card-body">
+        <div class="menu-card-name">Veggie Whopper</div>
+        <div class="menu-card-desc">A plant-based patty with all the Whopper fixings — same size, same satisfaction, zero beef.</div>
+        <div class="menu-card-footer">
+          <span class="menu-card-price">₹189</span>
+          <button class="add-btn">+</button>
+        </div>
+      </div>
+    </div>
+    <!-- Card 5 -->
+    <div class="menu-card">
+      <div class="menu-card-img">🍟</div>
+      <div class="menu-card-body">
+        <div class="menu-card-name">King Fries (L)</div>
+        <div class="menu-card-desc">Golden, crispy, salted to perfection. The perfect crown for your meal.</div>
+        <div class="menu-card-footer">
+          <span class="menu-card-price">₹99</span>
+          <button class="add-btn">+</button>
+        </div>
+      </div>
+    </div>
+    <!-- Card 6 -->
+    <div class="menu-card">
+      <span class="menu-card-badge" style="background:var(--bk-yellow);color:var(--bk-dark)">⭐ New</span>
+      <div class="menu-card-img">🥓</div>
+      <div class="menu-card-body">
+        <div class="menu-card-name">Bacon King</div>
+        <div class="menu-card-desc">Two massive flame-grilled patties, crispy bacon, American cheese. Absolute excess, beautifully executed.</div>
+        <div class="menu-card-footer">
+          <span class="menu-card-price">₹279</span>
+          <button class="add-btn">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DEAL BANNER -->
+<section class="deal-banner reveal" id="deals">
+  <div>
+    <span class="deal-tag">🎉 Limited Time</span>
+    <h2 class="section-title" style="color:#fff">KING MEAL<br>COMBO — 30% OFF</h2>
+    <p class="section-subtitle" style="color:rgba(255,255,255,.7);margin-top:12px;">Any Whopper + King Fries (L) + Soft Drink. Every day, all day. No code needed — just show up hungry.</p>
+    <a href="#menu" class="btn-primary" style="display:inline-block;margin-top:28px;">Grab the Deal</a>
+  </div>
+  <div style="text-align:center;">
+    <div style="font-size:8rem;line-height:1;animation:floatBurger 3s ease-in-out infinite">🍔</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:5rem;color:var(--bk-yellow);line-height:.9;text-shadow:3px 3px 0 rgba(0,0,0,.3)">₹349<br><span style="font-size:1.8rem;color:rgba(255,255,255,.5);text-decoration:line-through">₹499</span></div>
+  </div>
+</section>
+
+<!-- LOCATOR -->
+<section class="locator-section" id="locator">
+  <div class="reveal">
+    <p style="color:var(--bk-orange);font-weight:900;letter-spacing:2px;text-transform:uppercase;font-size:.82rem;margin-bottom:8px;">📍 Find Your King</p>
+    <h2 class="section-title">NEAREST<br>RESTAURANT</h2>
+    <p class="section-subtitle">Hot and fresh — always close by. Dine in, drive-thru, or get it delivered. Your call.</p>
+  </div>
+  <div class="locator-grid reveal">
+    <div>
+      <div class="locator-form">
+        <div class="input-row">
+          <input class="search-input" type="text" placeholder="Enter your city or pincode…" />
+          <button class="btn-primary" style="flex-shrink:0;padding:16px 24px">Search</button>
+        </div>
+      </div>
+      <div class="location-list">
+        <div class="location-item">
+          <div>
+            <div class="loc-name">BK Lajpat Nagar, New Delhi</div>
+            <div class="loc-dist">0.4 km away · Ring Road</div>
+          </div>
+          <span class="loc-open">Open Now</span>
+        </div>
+        <div class="location-item">
+          <div>
+            <div class="loc-name">BK South Extension Part II</div>
+            <div class="loc-dist">1.2 km away · Main Market</div>
+          </div>
+          <span class="loc-open">Open Now</span>
+        </div>
+        <div class="location-item">
+          <div>
+            <div class="loc-name">BK Saket Select Citywalk</div>
+            <div class="loc-dist">3.0 km away · Food Court</div>
+          </div>
+          <span class="loc-open">Open Now</span>
+        </div>
+        <div class="location-item">
+          <div>
+            <div class="loc-name">BK Nehru Place</div>
+            <div class="loc-dist">4.5 km away · Nehru Place Metro</div>
+          </div>
+          <span style="font-size:.75rem;color:#ff6b3d;font-weight:700;letter-spacing:1px;">Closes 11pm</span>
+        </div>
+      </div>
+    </div>
+    <div class="map-placeholder">
+      <div class="map-icon">🗺️</div>
+      <div>Interactive Map</div>
+      <div style="font-size:.75rem;letter-spacing:.5px;color:#4a2818;max-width:200px;text-align:center;line-height:1.5;">Enter your location above to see all nearby outlets</div>
+    </div>
+  </div>
+</section>
+
+<!-- APP SECTION -->
+<section class="app-section reveal" id="app">
+  <div>
+    <p style="color:var(--bk-orange);font-weight:900;letter-spacing:2px;text-transform:uppercase;font-size:.82rem;margin-bottom:8px;">📱 Get the App</p>
+    <h2 class="section-title">ORDER SMARTER.<br>EAT BETTER.</h2>
+    <p class="section-subtitle" style="margin-top:12px">Skip the queue. Unlock exclusive deals. Track your order. Collect Royal Perks points with every bite.</p>
+    <ul style="margin-top:24px;list-style:none;display:flex;flex-direction:column;gap:12px">
+      <li style="display:flex;gap:12px;align-items:center;color:#c9a980;font-size:.92rem"><span style="font-size:1.3rem">🎁</span> Exclusive app-only deals every week</li>
+      <li style="display:flex;gap:12px;align-items:center;color:#c9a980;font-size:.92rem"><span style="font-size:1.3rem">👑</span> Royal Perks loyalty rewards program</li>
+      <li style="display:flex;gap:12px;align-items:center;color:#c9a980;font-size:.92rem"><span style="font-size:1.3rem">🚀</span> Express pickup — no waiting in line</li>
+      <li style="display:flex;gap:12px;align-items:center;color:#c9a980;font-size:.92rem"><span style="font-size:1.3rem">🛵</span> Live delivery tracking right to your door</li>
+    </ul>
+    <div class="app-badge-row">
+      <a href="#" class="app-badge">
+        <span class="app-badge-icon">🍎</span>
+        <div><div style="font-size:.65rem;color:#9a6040;letter-spacing:1px">DOWNLOAD ON THE</div><div style="font-weight:900">App Store</div></div>
+      </a>
+      <a href="#" class="app-badge">
+        <span class="app-badge-icon">▶</span>
+        <div><div style="font-size:.65rem;color:#9a6040;letter-spacing:1px">GET IT ON</div><div style="font-weight:900">Google Play</div></div>
+      </a>
+    </div>
+  </div>
+  <div class="app-phones">
+    <div class="phone-mockup">
+      <div style="text-align:center">
+        <div class="phone-screen-content">🍔</div>
+        <div class="phone-screen-label">Order Screen</div>
+      </div>
+    </div>
+    <div class="phone-mockup">
+      <div style="text-align:center">
+        <div class="phone-screen-content">👑</div>
+        <div class="phone-screen-label">Royal Perks</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials-section">
+  <div class="reveal" style="text-align:center">
+    <p style="color:var(--bk-orange);font-weight:900;letter-spacing:2px;text-transform:uppercase;font-size:.82rem;margin-bottom:8px;">💬 What They Say</p>
+    <h2 class="section-title">REAL PEOPLE.<br>REAL REACTIONS.</h2>
+  </div>
+  <div class="testi-grid reveal">
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-text">"The Whopper hits different at 1am after a long day. The flame-grill flavor is genuinely unmatched — no other fast food chain comes close."</p>
+      <div class="testi-author">
+        <div class="testi-avatar">R</div>
+        <div>
+          <div class="testi-name">Rahul M.</div>
+          <div class="testi-date">Google Review · March 2026</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-text">"I switched from McD purely for the app deals. The Royal Perks program is actually legit — free Whopper after 5 orders? Sold."</p>
+      <div class="testi-author">
+        <div class="testi-avatar" style="background:var(--bk-orange)">P</div>
+        <div>
+          <div class="testi-name">Priya S.</div>
+          <div class="testi-date">App Store Review · Feb 2026</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="testi-stars">★★★★☆</div>
+      <p class="testi-text">"Spicy Crispy Chicken is criminally underrated. Crispy on the outside, juicy inside, and the spice level actually means business."</p>
+      <div class="testi-author">
+        <div class="testi-avatar" style="background:#c96c00">A</div>
+        <div>
+          <div class="testi-name">Amit K.</div>
+          <div class="testi-date">Zomato Review · Jan 2026</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid reveal">
+    <div class="footer-brand">
+      <div class="nav-logo" style="font-size:2.2rem">BURGER KING</div>
+      <p>Flame-grilled since 1954. We don't microwave. We don't fake it. Every burger is made to order — your way, every time.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Menu</h4>
+      <ul>
+        <li><a href="#">Burgers</a></li>
+        <li><a href="#">Chicken</a></li>
+        <li><a href="#">Sides & Fries</a></li>
+        <li><a href="#">Drinks</a></li>
+        <li><a href="#">Desserts</a></li>
+        <li><a href="#">Value Meals</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#">About BK</a></li>
+        <li><a href="#">Careers</a></li>
+        <li><a href="#">Franchising</a></li>
+        <li><a href="#">Sustainability</a></li>
+        <li><a href="#">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Help</h4>
+      <ul>
+        <li><a href="#">Contact Us</a></li>
+        <li><a href="#">Allergen Info</a></li>
+        <li><a href="#">Nutritional Info</a></li>
+        <li><a href="#">Gift Cards</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Use</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2026 Burger King Corporation. All rights reserved. This is a design concept — not an official Burger King site.</div>
+    <div style="display:flex;gap:16px">
+      <a href="#" style="color:#3a1800;text-decoration:none;font-size:1.3rem;transition:color .2s" onmouseover="this.style.color='#FFCB00'" onmouseout="this.style.color='#3a1800'">𝕏</a>
+      <a href="#" style="color:#3a1800;text-decoration:none;font-size:1.3rem;transition:color .2s" onmouseover="this.style.color='#FFCB00'" onmouseout="this.style.color='#3a1800'">📘</a>
+      <a href="#" style="color:#3a1800;text-decoration:none;font-size:1.3rem;transition:color .2s" onmouseover="this.style.color='#FFCB00'" onmouseout="this.style.color='#3a1800'">📸</a>
+    </div>
+  </div>
+</footer>
+
+<!-- FLOATING CART -->
+<button class="floating-cart" onclick="alert('Cart feature — connect to your ordering backend!')">
+  🛒
+  <span class="cart-badge">3</span>
+</button>
+
+<script>
+  // Tab Switching
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  // Add to cart feedback
+  document.querySelectorAll('.add-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      btn.textContent = '✓';
+      btn.style.background = '#2e7d32';
+      setTimeout(() => { btn.textContent = '+'; btn.style.background = ''; }, 1200);
+    });
+  });
+
+  // Scroll Reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
